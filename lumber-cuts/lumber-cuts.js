@@ -326,7 +326,7 @@ function displaySolution(title, description, bins, inputs) {
     bins.map((sublist) => (
       `<li>${sublist.map((cut) => formatCut(cut, inputs.colors, inputs.cutWidth)).join(", ")} ` + 
       `<span style="color: ${inputs.colors.false}">` +
-        `(${inputs.lumberLen - sumCutList(sublist)}" left over)` +
+        `(${inputs.lumberLen - sumCutList(sublist)}" ± ${inputs.lumberMargin}" left over)` +
       `</span></li>`
     )).join("") +
     `</ul>`
