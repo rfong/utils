@@ -1,3 +1,7 @@
+import { HSVtoRGB } from './color-convert.js';
+
+console.log(HSVtoRGB(0.21,0,0.5));
+
 /* Simple DOM management */
 
 function onReady(fn) {
@@ -262,7 +266,30 @@ function groupedSolve(inputs) {
     bins = bins.concat(subSoln);
   }
 
-  // TODO: If any bins can be trivially combined together, do that.
+  // If any bins can be trivially combined together, do that.
+  // (Note: We could avoid an O(n^3) calculation by caching the remainders with 
+  // the bins, but that makes the data structure annoying and we're working 
+  // with relatively small `n` anyways.)
+  
+  // Sort in descending order of sum, or ascendiing order of remainder.
+  bins = bins.sort((a,b) => sumCutList(a) - sumCutList(b)).reverse(); 
+
+  // Loop over all bins.
+  for (var i=0; i<bins.length-1; i++) {
+    var bin = bins[i];
+    // Find the most-full bin that has enough space to merge with this bin.
+    for (var j=i+1; j<bins.length; j++) {
+      var bin2 = bins[j];
+      if (getBinRemainder(bin2) >= (lumberLen - getBinRemainder(bin))) {
+        // Merge 2nd bin into first bin
+        bins[i] = bin.concat(bin2);
+        // Remove 2nd bin
+        bins.splice(j,1);
+        // Exit j-loop
+        j = bins.length;
+      }
+    }
+  }
 
   // Cram in the miscellaneous pieces wherever they will fit.
   bins = solveCuts(
@@ -280,33 +307,58 @@ function groupedSolve(inputs) {
   );
 }
 
-function sumList(myList) {
-  return myList == [] ? 0 : myList.reduce((a,b) => a+b, 0);
-}
-
 function sumCutList(cutList) {
   return sumList(cutList.map((cut) => cut.value));
+}
+
+function sumList(myList) {
+  return myList == [] ? 0 : myList.reduce((a,b) => a+b, 0);
 }
 
 /* Solution formatting */
 
 function displaySolution(title, description, bins, inputs) {
-  // Format HTML.
+  // Format solution HTML and display in output.
   getEl("output").innerHTML += (
     `<h3>${title} (${bins.length} pieces)</h3>` +
     description +
     `<ul>` +
     bins.map((sublist) => (
       `<li>${sublist.map((cut) => formatCut(cut, inputs.colors, inputs.cutWidth)).join(", ")} ` + 
-      `(${inputs.lumberLen - sumCutList(sublist)}" left over)</li>`
+      `<span style="color: ${inputs.colors.false}">` +
+        `(${inputs.lumberLen - sumCutList(sublist)}" left over)` +
+      `</span></li>`
     )).join("") +
     `</ul>`
+  );
+}
+
+function displayLegend(colors) {
+  // Format color legend HTML and display in output.
+  colors["miscellaneous parts"] = colors["false"];
+  delete colors["false"];
+  getEl("output").innerHTML += (
+    `<h3>Color legend</h3>` +
+    Object.keys(colors).map((partName) => 
+      `<span style="color: ${colors[partName]}">${partName}</span>`
+    ).join(", ")
   );
 }
 
 function formatCut(cut, colors, cutWidth) {
   /* Format a Cut for HTML output, colored to indicate its part. */
   return `<span style="color:${colors[cut.partName]}">${cut.value - cutWidth}"</span>`;
+}
+
+function formatRGB(r,g,b) {
+  /* Format RGB color for CSS output. */
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function formatHSV(h,s,v) {
+  /* Format HSV color as RGB for CSS output. */
+  let color = HSVtoRGB(h,s,v);
+  return formatRGB(color.r, color.g, color.b);
 }
 
 /* Setup function on document ready */
@@ -320,18 +372,22 @@ onReady(() => {
     let inputs = getAndValidateInputs();
     if (inputs === undefined) { return; }
 
-    // Pick colors for each part
-    // Test placeholder. TODO actually generate colors based on inputs.
+    // Pick colors for each part by going around the HSV wheel.
     inputs.colors = {
-      false: '#666',
-      part1: '#0f6',
-      part2: '#60f',
+      false: formatHSV(0, 0, 0.4),
     };
-    // TODO Display color legend
+    let partNames = Object.keys(inputs.cuts).filter((k) => !(k == 'false'));
+    for (const i in partNames) {
+      var partName = partNames[i];
+      inputs.colors[partName] = formatHSV(1.0 * i / partNames.length, 1, 0.7);
+    };
 
     // Run solvers
     groupedSolve(inputs);
     naiveSolve(inputs);
+
+    // Display color legend for parts
+    displayLegend(inputs.colors);
 
   });
 
