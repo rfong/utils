@@ -1,0 +1,12 @@
+body {
+  padding: 50px;
+}
+input, textarea, label {
+  display: block;
+}
+input, textarea {
+  margin-bottom: 1em;
+}
+.container {
+  margin: 1em 0;
+}

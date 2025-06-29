@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="../style.css" />
+
+<script type="module" src="lumber-cuts.js"></script>
+
+<div><a href="../index.html"><< back</a></div>
+
+<h1>Lumber cut planner</h1>
+Plan linear lumber cuts, using imperial/U.S. units.
+
+<div class="container">
+  <label>Lumber length (feet)</label> 
+  <input type="text" id="input-lumber-len" value="8" />
+  
+  <label>Margin of error on lumber length (inches)</label> 
+  <input type="text" id="input-lumber-margin" value="1" />
+  
+  <label>Blade/cut width (inches)</label> 
+  <input type="text" id="input-cut-width" value="0.125" />
+  
+  <label>Cuts needed (inches), comma-separated.<br/>
+    Use part names to group together cuts you prefer clustered if possible.<br/>
+    <i>(part-name: 36, 36, 24, ...)</i>
+  </label> 
+  <textarea id="input-cuts" 
+            cols="50"
+            rows="5"
+            placeholder="part1: 36,36,22.5,22.5
+part2: 60,60,40
+8,8,4,4
+12,12,12">
+part1: 36,36,22.5,22.5
+part2: 60,60,40
+8,8,4,4
+12,12,12</textarea>
+  
+  <button id="submit-button">Calculate</button>
+</div>
+
+<div id="errors" class="container" style="color: red;"></div>
+<div id="output" class="container"></div>
