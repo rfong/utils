@@ -180,7 +180,7 @@ function naiveSolve(inputs) {
   // Display solution
   displaySolution(
     "Solution that ignores part groupings",
-    "This minimizes total lumber, but it's more annoying to physically track the parts:",
+    "This minimizes total lumber, but it's more annoying to physically track the parts. You probably don't want to do this unless you have very few parts.",
     solution,
     inputs,
   );
@@ -301,7 +301,7 @@ function groupedSolve(inputs) {
   // Display the solution.
   displaySolution(
     "Solution that prioritizes part groupings",
-    "Easier to physically keep track of assembly, but less cost-effective (unless you get lucky).",
+    "Easier to physically keep track of assembly, but may be less cost-effective (unless you get lucky or plan your build to optimize lumber).",
     bins,
     inputs,
   );
